@@ -1,12 +1,22 @@
 const express = require("express");
+const bodyParser = require('body-parser');
 const request = require("request");
+
 const firebase = require("firebase");
+firebase.initializeApp({
+  serviceAccount: "./serviceAccountCredentials.json",
+  databaseURL: "https://project-khoine.firebaseio.com/"
+});
+
+const resorts = require("./resorts.js");
 
 const domain = "localhost";
 const port = "8080";
 
 const forecast_path = "https://api.forecast.io/forecast/";
 const api_key = "f2778d0372266ff4099d2ee062db20bf";
+
+const firebase_endpoint = "https://project-khoine.firebaseio.com/";
 
 const home_lat = 49.168625;
 const home_lng = -123.142105;
@@ -16,6 +26,8 @@ const BAD_REQUEST = 400;
 const INTERNAL_ERROR = 500;
 
 var app = express();
+app.use(bodyParser.json()); // for parsing application/json
+app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 
 app.get("/health-check", (req, res) => {
     console.log("Health check request received...");
@@ -48,6 +60,12 @@ app.get("/test", (req, res) => {
         });
     }
 });
+
+app.put('/push_firebase', (req, res) => {
+    console.log(req.body);
+    res.end("Received");
+});
+
 
 var server = app.listen(port, domain, () => {
     var host = server.address().address;
